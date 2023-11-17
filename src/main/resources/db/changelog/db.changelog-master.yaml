@@ -1,0 +1,95 @@
+databaseChangeLog:
+  - changeSet:
+      id: nearby-1
+      author: nedimcolak.99@gmail.com
+      changes:
+        - createTable:
+            tableName: category
+            columns:
+              - column:
+                  name: id
+                  type: varchar(36)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: nvarchar(50)
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: product
+            columns:
+              - column:
+                  name: id
+                  type: varchar(36)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: nvarchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: nvarchar(500)
+              - column:
+                  name: category_id
+                  type: varchar(36)
+                  constraints:
+                    foreignKeyName: fk_product_category
+                    referencedTableName: category
+                    referencedColumnNames: id
+              - column:
+                  name: price
+                  type: float
+                  defaultValue: "0.0"
+              - column:
+                  name: latitude
+                  type: float
+                  constraints:
+                    nullable: false
+              - column:
+                  name: longitude
+                  type: float
+                  constraints:
+                    nullable: false
+              - column:
+                  name: views
+                  type: int
+                  defaultValue: "0"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: image
+                  type: varchar(100)
+        - createTable:
+            tableName: price_history
+            columns:
+              - column:
+                  name: id
+                  type: varchar(36)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: varchar(36)
+                  constraints:
+                    foreignKeyName: fk_price_history_product
+                    referencedTableName: product
+                    referencedColumnNames: id
+              - column:
+                  name: price
+                  type: float
+                  defaultValue: "0.0"
+              - column:
+                  name: timestamp
+                  type: timestamp
+  - changeSet:
+      id: nearby-2-seed-category
+      author: nedimcolak.99@gmail.com
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/insert-categories.sql

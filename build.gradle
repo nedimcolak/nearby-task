@@ -1,0 +1,50 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version "${spring_boot_version}"
+    id 'io.spring.dependency-management' version "${spring_boot_dependency_management_version}"
+    id 'com.diffplug.spotless' version "${spotless_plugin_version}"
+}
+
+group = 'com.nearby'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${openapi_version}"
+    implementation "org.liquibase:liquibase-core:${liquibase_version}"
+    implementation "com.diffplug.spotless:spotless-maven-plugin:${spotless_version}"
+    // implementation "org.springframework.boot:spring-boot-starter-security"
+
+    runtimeOnly 'org.postgresql:postgresql'
+
+    compileOnly "org.projectlombok:lombok:${lombok_version}"
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    annotationProcessor "org.projectlombok:lombok:${lombok_version}"
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "com.nearby.Application"
+    }
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+        importOrder()
+        removeUnusedImports()
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
