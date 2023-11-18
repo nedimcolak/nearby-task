@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-  private static final int PRODUCTS_PER_PAGE = 10;
+  private static final int PRODUCTS_PER_PAGE = 15;
 
   private final ProductRepository productRepository;
   private final CategoryRepository categoryRepository;
@@ -43,7 +43,7 @@ public class ProductServiceImpl implements ProductService {
             productRequestQueryDTO.searchTerm(),
             PageRequest.of(
                 page,
-                15,
+                PRODUCTS_PER_PAGE,
                 Sort.by(
                     Sort.Direction.fromOptionalString(productRequestQueryDTO.order())
                         .orElse(Sort.Direction.ASC),
@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public Slice<ProductDTO> findAllOrderByClosest(double latitude, double longitude, int page) {
     return SliceFactory.toSlice(
-        productRepository.getClosestProducts(latitude, longitude, PageRequest.of(0, 20)),
+        productRepository.getClosestProducts(latitude, longitude, PageRequest.of(page, PRODUCTS_PER_PAGE)),
         dtoFactory::toDto);
   }
 

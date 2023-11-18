@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
+  private final static int DEFAULT_PAGE_SIZE = 20;
+
   private final DtoFactory dtoFactory;
   private final EntityFactory entityFactory;
   private final CategoryRepository categoryRepository;
@@ -26,7 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
   @Override
   public Slice<CategoryDTO> findAll(int page) {
     return SliceFactory.toSlice(
-        categoryRepository.findAll(PageRequest.of(page, 20)), dtoFactory::toDto);
+        categoryRepository.findAll(PageRequest.of(page, DEFAULT_PAGE_SIZE)), dtoFactory::toDto);
   }
 
   @Override
