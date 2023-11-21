@@ -44,9 +44,10 @@ public class CategoryServiceImpl implements CategoryService {
 
   @Override
   public CategoryDTO update(String id, CreateCategoryDTO createCategoryDTO) {
-    categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
+    Category category = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
 
-    return dtoFactory.toDto(categoryRepository.save(entityFactory.toEntity(createCategoryDTO)));
+    category.setName(createCategoryDTO.name());
+    return dtoFactory.toDto(categoryRepository.save(category));
   }
 
   @Override

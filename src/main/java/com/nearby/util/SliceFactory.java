@@ -15,6 +15,7 @@ public class SliceFactory {
   public static <T, R> Slice<R> toSlice(final Page<T> source, Function<T, R> transform) {
     return Slice.<R>builder()
         .totalPages(BigInteger.valueOf(source.getTotalPages()))
+            .totalElements(source.getTotalElements())
         .pageData(source.stream().map(transform).collect(Collectors.toList()))
         .build();
   }

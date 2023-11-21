@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,14 +28,16 @@ public class ProductController {
   @ApiResponse(responseCode = "500", description = "Server error.")
   public Slice<ProductDTO> findAll(
       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+      @RequestParam(name = "pageSize", required = false) Integer pageSize,
       @RequestParam(name = "sortBy", required = false) String sortBy,
       @RequestParam(name = "order", required = false, defaultValue = "ASC") String order,
       @RequestParam(name = "minPrice", required = false) Double minPrice,
       @RequestParam(name = "maxPrice", required = false) Double maxPrice,
-      @RequestParam(name = "searchTerm", required = false, defaultValue = "") String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false, defaultValue = "") String searchTerm,
+      @RequestParam(name = "categories", required = false, defaultValue = "") String categories) {
     ProductRequestQueryDTO productRequestQueryDTO =
-        new ProductRequestQueryDTO(minPrice, maxPrice, searchTerm, sortBy, order);
-    return productService.findAll(productRequestQueryDTO, page);
+        new ProductRequestQueryDTO(categories, minPrice, maxPrice, searchTerm, sortBy, order);
+    return productService.findAll(productRequestQueryDTO, page, pageSize);
   }
 
   @GetMapping(value = "/nearby", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,9 +48,10 @@ public class ProductController {
   @ApiResponse(responseCode = "500", description = "Server error.")
   public Slice<ProductDTO> findClosest(
       @RequestParam(name = "page", defaultValue = "0") int page,
+      @RequestParam(name = "pageSize", required = false) Integer pageSize,
       @RequestParam(name = "lat") Double lat,
       @RequestParam(name = "lon") Double lon) {
-    return productService.findAllOrderByClosest(lat, lon, page);
+    return productService.findAllOrderByClosest(lat, lon, page, pageSize);
   }
 
   @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -68,5 +70,28 @@ public class ProductController {
   @ApiResponse(responseCode = "500", description = "Server error.")
   public ProductDTO addNewProduct(@RequestBody @Valid ProductCreateDTO productCreateDTO) {
     return productService.create(productCreateDTO);
+  }
+
+  @PutMapping(
+          value = "{id}",
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  @ApiResponse(responseCode = "200", description = "Updated product successfully!")
+  @ApiResponse(responseCode = "404", description = "Product with provided id does not exist.")
+  @ApiResponse(responseCode = "500", description = "Server error.")
+  public ProductDTO updateProduct(@PathVariable String id, @RequestBody @Valid ProductCreateDTO productCreateDTO) {
+    return productService.update(id, productCreateDTO);
+  }
+
+  @DeleteMapping(
+          value = "{id}",
+          produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  @ApiResponse(responseCode = "200", description = "Deleted product successfully!")
+  @ApiResponse(responseCode = "404", description = "Product with provided id does not exist.")
+  @ApiResponse(responseCode = "500", description = "Server error.")
+  public ProductDTO deleteProduct(@PathVariable String id) {
+    return productService.delete(id);
   }
 }

@@ -6,4 +6,4 @@ import lombok.Setter;
 
 
 public record ProductDTO(
-    String id, String name, Double price, int views, String categoryName, String image) {}
+    String id, String name, String description, Double price, int views, String categoryName, String categoryId, String image, Double latitude, Double longitude) {}

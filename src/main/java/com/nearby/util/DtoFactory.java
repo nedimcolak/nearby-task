@@ -18,10 +18,15 @@ public class DtoFactory {
     return new ProductDTO(
         product.getId(),
         product.getName(),
+            product.getDescription(),
         product.getPrice(),
         product.getViews(),
         product.getCategory().getName(),
-        product.getImage());
+        product.getCategory().getId(),
+        product.getImage(),
+            product.getLatitude(),
+            product.getLongitude()
+    );
   }
 
   public PriceHistoryDTO toDto(PriceHistory priceHistory) {

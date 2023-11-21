@@ -15,7 +15,14 @@ import com.nearby.service.ProductService;
 import com.nearby.util.DtoFactory;
 import com.nearby.util.EntityFactory;
 import com.nearby.util.SliceFactory;
-import java.util.Optional;
+
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -34,16 +41,20 @@ public class ProductServiceImpl implements ProductService {
   private final EntityFactory entityFactory;
 
   @Transactional(readOnly = true)
-  public Slice<ProductDTO> findAll(ProductRequestQueryDTO productRequestQueryDTO, int page) {
+  public Slice<ProductDTO> findAll(ProductRequestQueryDTO productRequestQueryDTO, int page, Integer pageSize) {
+    List<String> categoryList = List.of();
+    if (!productRequestQueryDTO.categories().isBlank()) {
+      categoryList = Arrays.stream(productRequestQueryDTO.categories().split(",")).toList();
+    }
     return SliceFactory.toSlice(
         productRepository.findAllFilterBy(
-            null,
+                categoryList,
             productRequestQueryDTO.minPrice(),
             productRequestQueryDTO.maxPrice(),
             productRequestQueryDTO.searchTerm(),
             PageRequest.of(
                 page,
-                PRODUCTS_PER_PAGE,
+                Optional.ofNullable(pageSize).orElse(PRODUCTS_PER_PAGE),
                 Sort.by(
                     Sort.Direction.fromOptionalString(productRequestQueryDTO.order())
                         .orElse(Sort.Direction.ASC),
@@ -52,9 +63,9 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public Slice<ProductDTO> findAllOrderByClosest(double latitude, double longitude, int page) {
+  public Slice<ProductDTO> findAllOrderByClosest(double latitude, double longitude, int page, int pageSize) {
     return SliceFactory.toSlice(
-        productRepository.getClosestProducts(latitude, longitude, PageRequest.of(page, PRODUCTS_PER_PAGE)),
+        productRepository.getClosestProducts(latitude, longitude, PageRequest.of(page, Optional.of(pageSize).orElse(PRODUCTS_PER_PAGE))),
         dtoFactory::toDto);
   }
 
@@ -91,7 +102,6 @@ public class ProductServiceImpl implements ProductService {
 
     product.setName(productCreateDTO.name());
     product.setDescription(productCreateDTO.description());
-    product.setViews(0);
     product.setLatitude(productCreateDTO.latitude());
     product.setLongitude(productCreateDTO.longitude());
     product.setPrice(productCreateDTO.price());

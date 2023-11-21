@@ -20,7 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
       Pageable pageable);
 
   @Query(
-      "SELECT p FROM product p WHERE (:searchTerm = ''  OR p.name LIKE concat('%', :searchTerm, '%')) AND (:categories is null OR p.category.id IN :categories) AND ((:minPrice is null OR p.price > :minPrice) AND (:maxPrice is null OR p.price < :maxPrice))")
+      "SELECT p FROM product p WHERE (:searchTerm = '' OR p.name ILIKE concat('%', :searchTerm, '%')) AND ((:#{#categories.size() == 0} = true) OR p.category.id IN :categories) AND ((:minPrice is null OR p.price > :minPrice) AND (:maxPrice is null OR p.price < :maxPrice))")
   Page<Product> findAllFilterBy(
       @Param(value = "categories") List<String> categories,
       @Param(value = "minPrice") Double minPrice,

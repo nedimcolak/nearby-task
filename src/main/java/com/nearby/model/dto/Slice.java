@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 public class Slice<T> {
+  private final Long totalElements;
   private final BigInteger totalPages;
   private final List<T> pageData;
 }
